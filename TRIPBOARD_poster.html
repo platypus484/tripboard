@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>TRIPBOARD — 프로젝트 포스터</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+  :root {
+    --color-main: #16213E;
+    --color-accent: #C1592A;
+    --color-neutral: #F2EAD8;
+    --color-ink: #1A1A1A;
+    --color-paper: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { width: 420mm; height: 594mm; }
+
+  body {
+    font-family: "Pretendard", -apple-system, sans-serif;
+    color: var(--color-ink);
+    background: var(--color-paper);
+    display: flex;
+    flex-direction: column;
+  }
+
+  @page { size: 420mm 594mm; margin: 0; }
+
+  .masthead {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10mm;
+    padding: 12mm 16mm 8mm;
+    border-bottom: 1mm solid var(--color-ink);
+  }
+  .masthead .product-name {
+    font-size: 17mm;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  .masthead .catchphrase {
+    font-size: 6mm;
+    font-weight: 600;
+    color: var(--color-accent);
+    text-align: right;
+  }
+
+  .problem {
+    flex: 0 0 auto;
+    padding: 7mm 16mm;
+    background: var(--color-main);
+    color: var(--color-paper);
+    text-align: center;
+    font-size: 6.4mm;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .problem .highlight { color: var(--color-accent); }
+
+  .showcase-hero {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    padding: 8mm 16mm;
+    background: var(--color-neutral);
+  }
+  .showcase-hero .frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1.5mm solid var(--color-ink);
+    border-radius: 3mm;
+    overflow: hidden;
+    box-shadow: 0 5mm 12mm rgba(0,0,0,0.22);
+  }
+  .showcase-hero .frame .browser-bar {
+    flex: 0 0 auto;
+    height: 8mm;
+    background: var(--color-ink);
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    padding: 0 4mm;
+  }
+  .showcase-hero .frame .browser-bar span {
+    width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--color-paper); opacity: 0.6;
+  }
+  .showcase-hero .frame img,
+  .showcase-hero .frame svg {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .showcase-strip {
+    flex: 0 0 62mm;
+    display: flex;
+    gap: 6mm;
+    padding: 0 16mm 8mm;
+    background: var(--color-neutral);
+  }
+  .showcase-strip .thumb {
+    flex: 1 1 0;
+    border: 1mm solid var(--color-ink);
+    border-radius: 2mm;
+    overflow: hidden;
+    box-shadow: 0 3mm 8mm rgba(0,0,0,0.15);
+  }
+  .showcase-strip .thumb img,
+  .showcase-strip .thumb svg { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+  .features {
+    flex: 0 0 auto;
+    display: flex;
+    padding: 10mm 16mm;
+    gap: 8mm;
+  }
+  .feature-item { flex: 1 1 0; display: flex; gap: 4mm; }
+  .feature-item .num {
+    font-size: 11mm;
+    font-weight: 800;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+  .feature-item .text { display: flex; flex-direction: column; gap: 2mm; }
+  .feature-item .feature-name { font-size: 5.6mm; font-weight: 700; color: var(--color-main); }
+  .feature-item .feature-desc { font-size: 4mm; line-height: 1.4; color: #4A4A4A; }
+
+  .footer {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6mm 16mm;
+    border-top: 0.6mm solid var(--color-neutral);
+  }
+  .footer .author { font-size: 4mm; font-weight: 500; color: #6B6B6B; }
+  .footer .closing-copy { font-size: 4.5mm; font-weight: 700; color: var(--color-main); }
+  .footer .qr-placeholder {
+    width: 18mm; height: 18mm;
+    background: var(--color-neutral);
+    border-radius: 1.5mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-main);
+    font-size: 2.6mm;
+  }
+</style>
+</head>
+<body>
+
+  <header class="masthead">
+    <div class="product-name">TRIPBOARD</div>
+    <div class="catchphrase">루트를 레고처럼, 드래그로 조립</div>
+  </header>
+
+  <section class="problem">
+    공항에서 <span class="highlight">블로그 사진을 하나하나 캡처해가며</span> 따라가야 했고, 마음에 든 루트도 전체를 복사하거나 새로 짜야 했다
+  </section>
+
+  <section class="showcase-hero">
+    <div class="frame">
+      <div class="browser-bar"><span></span><span></span><span></span></div>
+      <img src="prd2_hero.png" alt="보드판 — 카드를 드래그로 배치하고 화살표로 연결">
+    </div>
+  </section>
+
+  <section class="showcase-strip">
+    <div class="thumb"><img src="prd3.png" alt="탐색 — 다른 여행자의 루트를 국가별로 필터링해 둘러보기"></div>
+    <div class="thumb"><img src="prd1.png" alt="카드 제작 — 사진과 여행지를 선택해 나만의 루트 카드 만들기"></div>
+  </section>
+
+  <section class="features">
+    <div class="feature-item">
+      <div class="num">01</div>
+      <div class="text">
+        <div class="feature-name">카드 제작</div>
+        <div class="feature-desc">스텝별 사진·팁·비용까지 담아 나만의 루트 카드를 만든다</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="num">02</div>
+      <div class="text">
+        <div class="feature-name">보드판 조립</div>
+        <div class="feature-desc">드래그로 배치하고, 합치기·분리하기로 자유롭게 재구성한다</div>
+      </div>
+    </div>
+    <div class="feature-item">
+      <div class="num">03</div>
+      <div class="text">
+        <div class="feature-name">탐색 &amp; 재사용</div>
+        <div class="feature-desc">다른 루트를 통째로, 또는 스텝 하나만 골라 가져온다</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="author">정수현 · Personal Project</div>
+    <div class="closing-copy">이제, 루트는 조립하는 것</div>
+    <div class="qr-placeholder">QR</div>
+  </footer>
+
+</body>
+</html>
