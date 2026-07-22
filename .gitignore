@@ -1,0 +1,25 @@
+.vercel
+node_modules
+dist
+*.log
+.claude
+
+# stray OneDrive-conflict / backup copies, not the active source
+src/App-DESKTOP-*.jsx
+src/App.stale-backup.jsx
+
+# personal reference photos not used by the app (data lives in IndexedDB, not static assets)
+간사이 공항.png
+간사이 공항2.png
+간사이 공항3.png
+규카츠.png
+난바.png
+도톤보리 명물.jpg
+라멘.png
+라멘가게.png
+모모쥬.png
+오사카성.jpg
+오코노미야키.jpg
+호텔1.png
+호텔2.png
+화면 캡처 2026-07-21 165735.png
