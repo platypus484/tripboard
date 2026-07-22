@@ -1699,6 +1699,7 @@ export default function App(){
   const [selectedUids,setSelectedUids]=useState([]);
   const [selBox,setSelBox]=useState(null);
   const [boardZoom,setBoardZoom]=useState(1);
+  const [costBoxOpen,setCostBoxOpen]=useState(true);
   const [showBoardHelp,setShowBoardHelp]=useState(false);
   const [showManageHelp,setShowManageHelp]=useState(false);
   const [showExploreHelp,setShowExploreHelp]=useState(false);
@@ -2154,6 +2155,30 @@ export default function App(){
   return(
     <div style={{background:"#EDEDEF",height:"100vh",overflow:"hidden",display:"flex",justifyContent:"center"}}>
     <div style={{fontFamily:"-apple-system,'Pretendard',sans-serif",background:C.bg,height:"100vh",overflow:"hidden",width:"100%",maxWidth:1280,display:"flex",flexDirection:"column",boxShadow:"0 0 40px rgba(0,0,0,0.08)"}}>
+      <style>{`
+        @media (max-width: 640px) {
+          .tb-header{padding:0 10px !important;height:52px !important;gap:10px !important;justify-content:flex-start !important;}
+          .tb-logo-icon{width:28px !important;height:28px !important;font-size:15px !important;}
+          .tb-logo-text{display:none !important;}
+          .tb-nav{gap:1px !important;padding:3px !important;}
+          .tb-navbtn{padding:6px 9px !important;font-size:11px !important;}
+          .tb-header-meta{display:none !important;}
+          .tb-decktabs{flex-wrap:nowrap !important;}
+          .tb-deckhint{display:none !important;}
+          .tb-board-costbox{top:10px !important;right:10px !important;padding:8px 12px 8px 10px !important;gap:8px !important;border-radius:14px !important;}
+          .tb-board-costbox .tb-cost-icon{width:32px !important;height:32px !important;font-size:16px !important;}
+          .tb-board-costbox .tb-cost-label{font-size:9px !important;}
+          .tb-board-costbox .tb-cost-amount{font-size:17px !important;}
+          .tb-board-costbox .tb-cost-count{font-size:9px !important;}
+          .tb-cost-collapsed{top:10px !important;right:10px !important;height:36px !important;padding:0 12px !important;font-size:12px !important;}
+          .tb-board-help-wrap{bottom:16px !important;left:16px !important;}
+          .tb-board-help{height:38px !important;padding:0 12px 0 10px !important;font-size:12px !important;}
+          .tb-help-icon{width:18px !important;height:18px !important;font-size:11px !important;}
+          .tb-zoom-wrap{bottom:16px !important;right:16px !important;}
+          .tb-zoom-cluster button{height:28px !important;font-size:12px !important;}
+          .tb-clear-btn{height:38px !important;padding:0 12px !important;font-size:11px !important;}
+        }
+      `}</style>
       {detailCard&&<RouteDetailModal card={detailCard} onClose={()=>setDetailCard(null)}/>}
       {miscDetailCard&&<MiscDetailModal card={miscDetailCard} onClose={()=>setMiscDetailCard(null)} onUpdate={updateMiscCard}/>}
       {communityModal&&<CommunityDetailModal route={communityModal} savedIds={savedIds} onSave={saveRoute} onClose={()=>setCommunityModal(null)} onImportPhoto={(step)=>{addPhotoToCreate(step,communityModal);setCommunityModal(null);}} onSaveStep={saveStepAsCard} onImportBoard={importBoardFromPost}/>}
@@ -2165,19 +2190,19 @@ export default function App(){
         </div>
       )}
 
-      <div style={{height:60,background:C.white,padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${C.gray100}`,boxShadow:"0 1px 8px rgba(0,0,0,0.06)",flexShrink:0,position:"sticky",top:0,zIndex:1000}}>
+      <div className="tb-header" style={{height:60,background:C.white,padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${C.gray100}`,boxShadow:"0 1px 8px rgba(0,0,0,0.06)",flexShrink:0,position:"sticky",top:0,zIndex:1000}}>
         <div onClick={()=>setPage("explore")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
-          <div style={{width:34,height:34,borderRadius:10,background:`linear-gradient(135deg,${C.coral},${C.orange})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🗺️</div>
-          <span style={{fontSize:18,fontWeight:800,color:C.gray900,letterSpacing:-0.5}}>TRIPBOARD</span>
+          <div className="tb-logo-icon" style={{width:34,height:34,borderRadius:10,background:`linear-gradient(135deg,${C.coral},${C.orange})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🗺️</div>
+          <span className="tb-logo-text" style={{fontSize:18,fontWeight:800,color:C.gray900,letterSpacing:-0.5}}>TRIPBOARD</span>
         </div>
-        <nav style={{display:"flex",gap:2,background:C.gray50,borderRadius:12,padding:4}}>
+        <nav className="tb-nav" style={{display:"flex",gap:2,background:C.gray50,borderRadius:12,padding:4}}>
           {NAV.map(([key,label])=>(
-            <button key={key} onClick={()=>setPage(key)} style={{padding:"7px 18px",borderRadius:9,border:"none",cursor:"pointer",fontSize:12,fontWeight:600,background:page===key?C.white:"transparent",color:page===key?C.gray900:C.gray400,boxShadow:page===key?C.shadow:"none",transition:"all 0.15s"}}>
+            <button key={key} className="tb-navbtn" onClick={()=>setPage(key)} style={{padding:"7px 18px",borderRadius:9,border:"none",cursor:"pointer",fontSize:12,fontWeight:600,background:page===key?C.white:"transparent",color:page===key?C.gray900:C.gray400,boxShadow:page===key?C.shadow:"none",transition:"all 0.15s",whiteSpace:"nowrap"}}>
               {label}
             </button>
           ))}
         </nav>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div className="tb-header-meta" style={{display:"flex",alignItems:"center",gap:12}}>
           {totalCost>0&&<span style={{fontSize:13,fontWeight:700,color:C.coral}}>예상 {totalCost.toLocaleString()}원</span>}
           <span style={{fontSize:11,color:C.gray400}}>{routeCount}개 보드</span>
         </div>
@@ -2355,21 +2380,21 @@ export default function App(){
               </div>
             </div>
           </div>
-          <div style={{position:"absolute",bottom:32,right:36,zIndex:60,display:"flex",alignItems:"center",gap:8}}>
-            {boardItems.length>0&&<button onClick={()=>{if(window.confirm("보드판의 모든 카드를 지울까요? 되돌릴 수 없어요."))setBoardItems([]);}}
+          <div className="tb-zoom-wrap" style={{position:"absolute",bottom:32,right:36,zIndex:60,display:"flex",alignItems:"center",gap:8}}>
+            {boardItems.length>0&&<button className="tb-clear-btn" onClick={()=>{if(window.confirm("보드판의 모든 카드를 지울까요? 되돌릴 수 없어요."))setBoardItems([]);}}
               style={{height:44,padding:"0 16px",borderRadius:14,border:`1px solid ${C.gray200}`,background:C.white,color:C.gray600,fontSize:12,fontWeight:700,cursor:"pointer",boxShadow:"0 12px 32px rgba(0,0,0,0.14)"}}>
               보드판 비우기
             </button>}
-            <div style={{display:"flex",alignItems:"center",gap:2,background:C.white,borderRadius:14,padding:6,boxShadow:"0 12px 32px rgba(0,0,0,0.14)",border:`1px solid ${C.gray100}`}}>
+            <div className="tb-zoom-cluster" style={{display:"flex",alignItems:"center",gap:2,background:C.white,borderRadius:14,padding:6,boxShadow:"0 12px 32px rgba(0,0,0,0.14)",border:`1px solid ${C.gray100}`}}>
               <button onClick={()=>setBoardZoom(z=>Math.max(0.5,Math.round((z-0.1)*10)/10))} style={{width:32,height:32,borderRadius:9,border:"none",background:C.gray50,color:C.gray600,fontSize:16,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
               <button onClick={()=>setBoardZoom(1)} style={{minWidth:50,height:32,borderRadius:9,border:"none",background:"transparent",color:C.gray600,fontSize:12,fontWeight:600,cursor:"pointer"}}>{Math.round(boardZoom*100)}%</button>
               <button onClick={()=>setBoardZoom(z=>Math.min(2,Math.round((z+0.1)*10)/10))} style={{width:32,height:32,borderRadius:9,border:"none",background:C.gray50,color:C.gray600,fontSize:16,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
             </div>
           </div>
-          <div style={{position:"absolute",bottom:32,left:36,zIndex:60}}
+          <div className="tb-board-help-wrap" style={{position:"absolute",bottom:32,left:36,zIndex:60}}
             onMouseEnter={()=>setShowBoardHelp(true)} onMouseLeave={()=>setShowBoardHelp(false)}>
-            <button style={{height:44,padding:"0 18px 0 14px",borderRadius:22,background:`linear-gradient(135deg,${C.coral},${C.orange})`,border:"none",boxShadow:"0 12px 28px rgba(255,90,90,0.45)",cursor:"pointer",fontSize:14,fontWeight:800,color:"#fff",display:"flex",alignItems:"center",gap:7}}>
-              <span style={{width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>?</span>
+            <button className="tb-board-help" style={{height:44,padding:"0 18px 0 14px",borderRadius:22,background:`linear-gradient(135deg,${C.coral},${C.orange})`,border:"none",boxShadow:"0 12px 28px rgba(255,90,90,0.45)",cursor:"pointer",fontSize:14,fontWeight:800,color:"#fff",display:"flex",alignItems:"center",gap:7}}>
+              <span className="tb-help-icon" style={{width:22,height:22,borderRadius:"50%",background:"rgba(255,255,255,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>?</span>
               <span>사용법 보기</span>
             </button>
             {showBoardHelp&&<div style={{position:"absolute",bottom:44,left:0,width:280,background:C.white,borderRadius:14,padding:"16px 18px",boxShadow:"0 16px 40px rgba(0,0,0,0.18)",border:`1px solid ${C.gray100}`}}>
@@ -2385,29 +2410,35 @@ export default function App(){
               </div>
             </div>}
           </div>
-          {routeCount>0&&(
-            <div style={{position:"absolute",top:32,right:36,zIndex:60,pointerEvents:"none",display:"flex",alignItems:"center",gap:14,background:C.white,borderRadius:18,padding:"14px 22px 14px 16px",boxShadow:"0 12px 32px rgba(0,0,0,0.14)",border:`1px solid ${C.gray100}`}}>
-              <div style={{width:46,height:46,borderRadius:14,flexShrink:0,background:`linear-gradient(135deg,${C.coral}22,${C.orange}22)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💰</div>
+          {routeCount>0&&(costBoxOpen?(
+            <div className="tb-board-costbox" style={{position:"absolute",top:32,right:36,zIndex:60,display:"flex",alignItems:"center",gap:14,background:C.white,borderRadius:18,padding:"14px 22px 14px 16px",boxShadow:"0 12px 32px rgba(0,0,0,0.14)",border:`1px solid ${C.gray100}`}}>
+              <div className="tb-cost-icon" style={{width:46,height:46,borderRadius:14,flexShrink:0,background:`linear-gradient(135deg,${C.coral}22,${C.orange}22)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>💰</div>
               <div>
-                <div style={{fontSize:11,fontWeight:700,color:C.gray400,letterSpacing:0.3,marginBottom:3}}>예상 총 비용</div>
-                <div style={{fontSize:26,fontWeight:800,color:C.coral,lineHeight:1.05,letterSpacing:-0.5}}>
+                <div className="tb-cost-label" style={{fontSize:11,fontWeight:700,color:C.gray400,letterSpacing:0.3,marginBottom:3}}>예상 총 비용</div>
+                <div className="tb-cost-amount" style={{fontSize:26,fontWeight:800,color:C.coral,lineHeight:1.05,letterSpacing:-0.5}}>
                   {totalCost>0?`${totalCost.toLocaleString()}원`:"0원"}
                 </div>
-                <div style={{fontSize:11,color:C.gray400,marginTop:4,fontWeight:500}}>카드 {routeCount}개 담김</div>
+                <div className="tb-cost-count" style={{fontSize:11,color:C.gray400,marginTop:4,fontWeight:500}}>카드 {routeCount}개 담김</div>
               </div>
+              <button onClick={()=>setCostBoxOpen(false)} title="접기" style={{position:"absolute",top:-8,right:-8,width:24,height:24,borderRadius:"50%",background:C.white,border:`1px solid ${C.gray200}`,cursor:"pointer",fontSize:12,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}>✕</button>
             </div>
-          )}
+          ):(
+            <button className="tb-cost-collapsed" onClick={()=>setCostBoxOpen(true)} title="예상 총 비용 펼치기"
+              style={{position:"absolute",top:32,right:36,zIndex:60,height:44,padding:"0 16px",borderRadius:22,border:`1px solid ${C.gray200}`,background:C.white,color:C.coral,fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 12px 32px rgba(0,0,0,0.14)",display:"flex",alignItems:"center",gap:6}}>
+              💰 {totalCost>0?`${totalCost.toLocaleString()}원`:"0원"}
+            </button>
+          ))}
         </div>
       )}
 
       {page==="board"&&(
         <div id="card-deck" style={{padding:"14px 16px 20px",flexShrink:0,background:C.white,borderTop:`1px solid ${C.gray100}`}}>
-          <div style={{display:"flex",gap:6,marginBottom:10}}>
+          <div className="tb-decktabs" style={{display:"flex",gap:6,marginBottom:10,overflowX:"auto"}}>
             {[["route","루트 카드"],["arrow","화살표"],["text","텍스트"],["misc","기타"],["saved","저장한 카드"]].map(([key,label])=>(
-              <button key={key} onClick={()=>setDeckTab(key)} style={{padding:"5px 14px",borderRadius:20,border:`1.5px solid ${deckTab===key?C.coral:C.gray200}`,background:deckTab===key?"#FFF0F0":C.white,color:deckTab===key?C.coral:C.gray400,fontSize:11,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}}>{label}</button>
+              <button key={key} onClick={()=>setDeckTab(key)} style={{padding:"5px 14px",borderRadius:20,border:`1.5px solid ${deckTab===key?C.coral:C.gray200}`,background:deckTab===key?"#FFF0F0":C.white,color:deckTab===key?C.coral:C.gray400,fontSize:11,fontWeight:600,cursor:"pointer",transition:"all 0.15s",whiteSpace:"nowrap",flexShrink:0}}>{label}</button>
             ))}
             <div style={{flex:1}}/>
-            <span style={{fontSize:10,color:C.gray400,alignSelf:"center"}}>드래그 → 보드 · 보드 카드 → 덱으로 드래그 시 제거</span>
+            <span className="tb-deckhint" style={{fontSize:10,color:C.gray400,alignSelf:"center",whiteSpace:"nowrap"}}>드래그 → 보드 · 보드 카드 → 덱으로 드래그 시 제거</span>
           </div>
           {deckTab==="route"&&<div data-deck-row="true" onMouseDown={handleDeckRowMouseDown} style={{display:"flex",gap:8,alignItems:"flex-start",overflowX:"auto",paddingBottom:2,cursor:"grab"}}>
             <div style={{position:"relative",flexShrink:0}}>
