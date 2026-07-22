@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, Fragment } from "react";
 import defaultData from "./defaultData.json";
+import mobileGuide1 from "../f1.jpg";
+import mobileGuide2 from "../f2.jpg";
 
 let storageErrorListeners=[];
 function notifyStorageError(message){storageErrorListeners.forEach(fn=>fn(message));}
@@ -1670,6 +1672,16 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
 export default function App(){
   const [storageError,dismissStorageError]=useStorageErrorBanner();
   const [page,setPage]=useState("explore");
+  const [showMobileGuide,setShowMobileGuide]=useState(false);
+  useEffect(()=>{
+    if(window.innerWidth>640)return;
+    if(localStorage.getItem("tripboard_hideMobileGuide")==="1")return;
+    setShowMobileGuide(true);
+  },[]);
+  function dismissMobileGuide(dontShowAgain){
+    setShowMobileGuide(false);
+    if(dontShowAgain)localStorage.setItem("tripboard_hideMobileGuide","1");
+  }
   const [boardItems,setBoardItems]=usePersistentState("tripboard_boardItems",defaultData.tripboard_boardItems??[]);
   const [deckTab,setDeckTab]=useState("route");
   const [selectedDeckRegion,setSelectedDeckRegion]=useState(null);
@@ -2182,6 +2194,30 @@ export default function App(){
       {detailCard&&<RouteDetailModal card={detailCard} onClose={()=>setDetailCard(null)}/>}
       {miscDetailCard&&<MiscDetailModal card={miscDetailCard} onClose={()=>setMiscDetailCard(null)} onUpdate={updateMiscCard}/>}
       {communityModal&&<CommunityDetailModal route={communityModal} savedIds={savedIds} onSave={saveRoute} onClose={()=>setCommunityModal(null)} onImportPhoto={(step)=>{addPhotoToCreate(step,communityModal);setCommunityModal(null);}} onSaveStep={saveStepAsCard} onImportBoard={importBoardFromPost}/>}
+      {showMobileGuide&&(
+        <div style={{position:"fixed",inset:0,zIndex:999999,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}} onClick={()=>dismissMobileGuide(false)}>
+          <div style={{background:C.white,borderRadius:20,width:"min(360px,100%)",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 24px 64px rgba(0,0,0,0.3)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:"20px 20px 4px"}}>
+              <div style={{fontSize:17,fontWeight:800,color:C.gray900,marginBottom:6}}>📱 PC 화면으로 더 편하게 보기</div>
+              <div style={{fontSize:13,color:C.gray600,lineHeight:1.6,marginBottom:14}}>브라우저 메뉴에서 <b>"데스크톱 사이트"</b>를 켜면 화면을 더 편하게 볼 수 있어요.</div>
+            </div>
+            <div style={{padding:"0 20px",display:"flex",flexDirection:"column",gap:10}}>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:C.coral,marginBottom:4}}>1. 브라우저 메뉴(⋮) 누르기</div>
+                <img src={mobileGuide1} alt="브라우저 메뉴 버튼 위치" style={{width:"100%",borderRadius:12,border:`1px solid ${C.gray100}`}}/>
+              </div>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:C.coral,marginBottom:4}}>2. "데스크톱 사이트" 켜기</div>
+                <img src={mobileGuide2} alt="데스크톱 사이트 메뉴 항목 위치" style={{width:"100%",borderRadius:12,border:`1px solid ${C.gray100}`}}/>
+              </div>
+            </div>
+            <div style={{padding:20,display:"flex",flexDirection:"column",gap:8}}>
+              <button onClick={()=>dismissMobileGuide(false)} style={{width:"100%",padding:"13px",borderRadius:12,border:"none",background:C.coral,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer"}}>확인했어요</button>
+              <button onClick={()=>dismissMobileGuide(true)} style={{width:"100%",padding:"10px",borderRadius:12,border:"none",background:"transparent",color:C.gray400,fontSize:12,fontWeight:600,cursor:"pointer"}}>다시 보지 않기</button>
+            </div>
+          </div>
+        </div>
+      )}
       {storageError&&(
         <div style={{position:"fixed",top:76,left:"50%",transform:"translateX(-50%)",zIndex:999999,maxWidth:"min(520px,90vw)",background:"#FFF0F0",border:`1.5px solid ${C.coral}`,borderRadius:14,padding:"14px 18px",boxShadow:"0 12px 32px rgba(0,0,0,0.18)",display:"flex",alignItems:"flex-start",gap:12}}>
           <span style={{fontSize:20,flexShrink:0}}>⚠️</span>
