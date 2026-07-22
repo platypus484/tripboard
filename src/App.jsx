@@ -596,7 +596,7 @@ function useDragFromDeck(item,onDrop,zoom=1){
   const [isDragging,setIsDragging]=useState(false);
   const [ghost,setGhost]=useState(null);
   const [overBoard,setOverBoard]=useState(false);
-  function onMouseDown(e){
+  function onPointerDown(e){
     e.preventDefault();setIsDragging(true);setGhost({x:e.clientX,y:e.clientY});
     function onMove(ev){setGhost({x:ev.clientX,y:ev.clientY});const b=document.getElementById("game-board");const r=b.getBoundingClientRect();setOverBoard(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom);}
     function onUp(ev){
@@ -607,11 +607,11 @@ function useDragFromDeck(item,onDrop,zoom=1){
         const halfH=item.type==="misc"?66:item.type==="text"?55:item.type==="arrow"?32:115;
         onDrop(item,{x:Math.max(0,(ev.clientX-r.left)/zoom-halfW),y:Math.max(0,(ev.clientY-r.top)/zoom-halfH)});
       }
-      window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);
+      window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);
     }
-    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
+    window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);
   }
-  return{isDragging,ghost,overBoard,onMouseDown};
+  return{isDragging,ghost,overBoard,onPointerDown};
 }
 
 function useBoardDrag(card,onRemove,cardW,cardH,scale=1,onPosChange,groupDrag,zoom=1){
@@ -627,7 +627,7 @@ function useBoardDrag(card,onRemove,cardW,cardH,scale=1,onPosChange,groupDrag,zo
       forceRender(n=>n+1);
     }
   },[card.pos]);
-  function onMouseDown(e){
+  function onPointerDown(e){
     if(e.target.closest(".rm-btn")||e.target.closest(".resize-handle"))return;e.preventDefault();e.stopPropagation();hasMoved.current=false;
     if(isSelected&&selectedCount>1){
       const sx=e.clientX,sy=e.clientY;
@@ -643,9 +643,9 @@ function useBoardDrag(card,onRemove,cardW,cardH,scale=1,onPosChange,groupDrag,zo
         }else{
           groupDrag.onGroupEnd();
         }
-        window.removeEventListener("mousemove",onMoveG);window.removeEventListener("mouseup",onUpG);
+        window.removeEventListener("pointermove",onMoveG);window.removeEventListener("pointerup",onUpG);
       }
-      window.addEventListener("mousemove",onMoveG);window.addEventListener("mouseup",onUpG);
+      window.addEventListener("pointermove",onMoveG);window.addEventListener("pointerup",onUpG);
       return;
     }
     const sx=e.clientX,sy=e.clientY,startX=pos.current.x,startY=pos.current.y;
@@ -658,11 +658,11 @@ function useBoardDrag(card,onRemove,cardW,cardH,scale=1,onPosChange,groupDrag,zo
         if(!isInDeck(ev.clientX,ev.clientY))onPosChange?.(card.uid,pos.current);
       }
       if(moved&&isInDeck(ev.clientX,ev.clientY))onRemove(card.uid);
-      window.removeEventListener("mousemove",onMove);window.removeEventListener("mouseup",onUp);
+      window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);
     }
-    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
+    window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);
   }
-  return{hovered,setHovered,isDragging,overDeck,ghostPos,pos,onMouseDown,justDraggedRef,isSelected};
+  return{hovered,setHovered,isDragging,overDeck,ghostPos,pos,onPointerDown,justDraggedRef,isSelected};
 }
 
 function useCardResize(card,onResize,pos,onPosChange,zoom=1){
@@ -697,24 +697,24 @@ function useCardResize(card,onResize,pos,onPosChange,zoom=1){
     }
     function onUp(){
       setIsResizing(false);
-      window.removeEventListener("mousemove",onMove);
-      window.removeEventListener("mouseup",onUp);
+      window.removeEventListener("pointermove",onMove);
+      window.removeEventListener("pointerup",onUp);
       onPosChange?.(card.uid,pos.current);
       setTimeout(()=>{resizedRef.current=false;},0);
     }
-    window.addEventListener("mousemove",onMove);window.addEventListener("mouseup",onUp);
+    window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);
   }
   return{isResizing,resizedRef,startResize};
 }
 
 function RouteDeckCard({route,onDrop,onRemoveFromDeck,zoom}){
   const [hov,setHov]=useState(false);
-  const {isDragging,ghost,overBoard,onMouseDown}=useDragFromDeck(route,onDrop,zoom);
+  const {isDragging,ghost,overBoard,onPointerDown}=useDragFromDeck(route,onDrop,zoom);
   return(
     <>
       <div style={{position:"relative",flexShrink:0}}>
-        <div onMouseDown={onMouseDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-          style={{width:152,background:hov&&!isDragging?route.bg:C.white,border:`1.5px solid ${hov&&!isDragging?route.color:C.gray200}`,borderRadius:18,padding:"18px 12px",cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-6px)":"translateY(0)",transition:"all 0.18s",textAlign:"center",opacity:isDragging?0.3:1,userSelect:"none",boxShadow:hov&&!isDragging?`0 8px 20px ${route.color}30`:C.shadow}}>
+        <div onPointerDown={onPointerDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+          style={{width:152,background:hov&&!isDragging?route.bg:C.white,border:`1.5px solid ${hov&&!isDragging?route.color:C.gray200}`,borderRadius:18,padding:"18px 12px",cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-6px)":"translateY(0)",transition:"all 0.18s",textAlign:"center",opacity:isDragging?0.3:1,userSelect:"none",touchAction:"none",boxShadow:hov&&!isDragging?`0 8px 20px ${route.color}30`:C.shadow}}>
           {route.photo?.dataUrl?<img src={route.photo.dataUrl} alt="" style={{width:44,height:44,borderRadius:10,objectFit:"cover",marginBottom:8}}/>:<div style={{fontSize:44,marginBottom:8}}>{route.emoji}</div>}
           <div style={{fontSize:14,fontWeight:600,color:C.gray600,lineHeight:1.3,marginBottom:4}}>{route.title}</div>
           <div style={{fontSize:14,color:route.color,fontWeight:500}}>{route.cost}</div>
@@ -732,12 +732,12 @@ function RouteDeckCard({route,onDrop,onRemoveFromDeck,zoom}){
 
 function ArrowDeckCard({arrow,onDrop,zoom}){
   const [hov,setHov]=useState(false);
-  const {isDragging,ghost,overBoard,onMouseDown}=useDragFromDeck(arrow,onDrop,zoom);
+  const {isDragging,ghost,overBoard,onPointerDown}=useDragFromDeck(arrow,onDrop,zoom);
   const isTxt=arrow.dir==="then"||arrow.dir==="next";
   return(
     <>
-      <div onMouseDown={onMouseDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-        style={{width:96,height:96,flexShrink:0,background:hov&&!isDragging?arrow.bg:C.white,border:`1.5px solid ${hov&&!isDragging?arrow.color:C.gray200}`,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${arrow.color}30`:C.shadow}}>
+      <div onPointerDown={onPointerDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+        style={{width:96,height:96,flexShrink:0,background:hov&&!isDragging?arrow.bg:C.white,border:`1.5px solid ${hov&&!isDragging?arrow.color:C.gray200}`,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",touchAction:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${arrow.color}30`:C.shadow}}>
         <span style={{fontSize:isTxt?18:38,fontWeight:700,color:hov?arrow.color:C.gray400}}>{arrow.label}</span>
       </div>
       {isDragging&&ghost&&<div style={{position:"fixed",left:ghost.x-64,top:ghost.y-64,width:128,height:128,background:overBoard?arrow.bg:C.white,border:`2px solid ${overBoard?arrow.color:C.gray200}`,borderRadius:16,pointerEvents:"none",zIndex:9999,opacity:0.95,transform:"scale(1.1) rotate(4deg)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 12px 32px rgba(0,0,0,0.2)"}}>
@@ -749,11 +749,11 @@ function ArrowDeckCard({arrow,onDrop,zoom}){
 
 function TextDeckCard({template,onDrop,zoom}){
   const [hov,setHov]=useState(false);
-  const {isDragging,ghost,overBoard,onMouseDown}=useDragFromDeck({...template},onDrop,zoom);
+  const {isDragging,ghost,overBoard,onPointerDown}=useDragFromDeck({...template},onDrop,zoom);
   return(
     <>
-      <div onMouseDown={onMouseDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-        style={{width:100,height:100,flexShrink:0,background:hov&&!isDragging?template.bg:C.white,border:`1.5px solid ${hov&&!isDragging?template.color:C.gray200}`,borderRadius:16,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${template.color}30`:C.shadow}}>
+      <div onPointerDown={onPointerDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+        style={{width:100,height:100,flexShrink:0,background:hov&&!isDragging?template.bg:C.white,border:`1.5px solid ${hov&&!isDragging?template.color:C.gray200}`,borderRadius:16,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",touchAction:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${template.color}30`:C.shadow}}>
         <span style={{fontSize:32}}>{template.icon}</span>
         <span style={{fontSize:13,fontWeight:600,color:C.gray400}}>{template.label}</span>
       </div>
@@ -766,12 +766,12 @@ function TextDeckCard({template,onDrop,zoom}){
 
 function MiscDeckCard({template,onDrop,onRemoveFromDeck,zoom}){
   const [hov,setHov]=useState(false);
-  const {isDragging,ghost,overBoard,onMouseDown}=useDragFromDeck({...template},onDrop,zoom);
+  const {isDragging,ghost,overBoard,onPointerDown}=useDragFromDeck({...template},onDrop,zoom);
   return(
     <>
       <div style={{position:"relative",flexShrink:0}}>
-        <div onMouseDown={onMouseDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-          style={{width:100,height:100,background:hov&&!isDragging?template.bg:C.white,border:`1.5px solid ${hov&&!isDragging?template.color:C.gray200}`,borderRadius:16,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${template.color}30`:C.shadow,overflow:"hidden"}}>
+        <div onPointerDown={onPointerDown} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+          style={{width:100,height:100,background:hov&&!isDragging?template.bg:C.white,border:`1.5px solid ${hov&&!isDragging?template.color:C.gray200}`,borderRadius:16,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,cursor:isDragging?"grabbing":"grab",transform:hov&&!isDragging?"translateY(-4px)":"translateY(0)",transition:"all 0.18s",opacity:isDragging?0.3:1,userSelect:"none",touchAction:"none",boxShadow:hov&&!isDragging?`0 6px 16px ${template.color}30`:C.shadow,overflow:"hidden"}}>
           {template.photo?.dataUrl?<img src={template.photo.dataUrl} alt="" style={{width:44,height:44,borderRadius:10,objectFit:"cover"}}/>:<span style={{fontSize:32}}>{template.icon}</span>}
           <span style={{fontSize:11,fontWeight:600,color:C.gray400,padding:"0 4px",textAlign:"center",lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"100%"}}>{template.label}</span>
         </div>
@@ -786,13 +786,13 @@ function MiscDeckCard({template,onDrop,onRemoveFromDeck,zoom}){
 
 function BoardRouteCard({card,onRemove,onOpen,onResize,onPosChange,groupDrag,zoom}){
   const scale=card.scale||1;
-  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onMouseDown,justDraggedRef,isSelected}=useBoardDrag(card,onRemove,196,244,scale,onPosChange,groupDrag,zoom);
+  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onPointerDown,justDraggedRef,isSelected}=useBoardDrag(card,onRemove,196,244,scale,onPosChange,groupDrag,zoom);
   const {isResizing,resizedRef,startResize}=useCardResize(card,onResize,pos,onPosChange,zoom);
   const HANDLES=[["tl","nwse-resize",{top:6,left:6}],["tr","nesw-resize",{top:6,right:6}],["bl","nesw-resize",{bottom:6,left:6}],["br","nwse-resize",{bottom:6,right:6}]];
   return(
     <>
-      <div data-carduid={card.uid} onMouseDown={onMouseDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={()=>{if(!isDragging&&!resizedRef.current&&!justDraggedRef.current)onOpen(card);}}
-        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:190,transform:`scale(${scale})`,transformOrigin:"top left",background:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:20,overflow:"hidden",cursor:isDragging?"grabbing":"grab",transition:isDragging||isResizing?"none":"border-color 0.15s,box-shadow 0.15s",boxShadow:overDeck?"none":isDragging?"0 20px 48px rgba(0,0,0,0.2)":hovered?C.shadowHover:C.shadow,zIndex:isDragging||isResizing?999:hovered?100:10,userSelect:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
+      <div data-carduid={card.uid} onPointerDown={onPointerDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={()=>{if(!isDragging&&!resizedRef.current&&!justDraggedRef.current)onOpen(card);}}
+        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:190,transform:`scale(${scale})`,transformOrigin:"top left",background:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:20,overflow:"hidden",cursor:isDragging?"grabbing":"grab",transition:isDragging||isResizing?"none":"border-color 0.15s,box-shadow 0.15s",boxShadow:overDeck?"none":isDragging?"0 20px 48px rgba(0,0,0,0.2)":hovered?C.shadowHover:C.shadow,zIndex:isDragging||isResizing?999:hovered?100:10,userSelect:"none",touchAction:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
         <div style={{height:130,background:card.bg||"#EEF4FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:48,position:"relative",overflow:"hidden"}}>
           {card.photo?.dataUrl?<img src={card.photo.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:card.emoji}
           {hovered&&!isDragging&&<button className="rm-btn" onClick={e=>{e.stopPropagation();onRemove(card.uid);}} style={{position:"absolute",top:8,right:8,width:26,height:26,borderRadius:"50%",background:"rgba(255,255,255,0.9)",border:"none",cursor:"pointer",fontSize:13,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",zIndex:20}}>✕</button>}
@@ -806,8 +806,8 @@ function BoardRouteCard({card,onRemove,onOpen,onResize,onPosChange,groupDrag,zoo
           {hovered&&!isDragging&&<div style={{fontSize:12,color:card.color||C.coral,fontWeight:600}}>탭해서 경로 보기</div>}
         </div>
         {onResize&&(hovered||isResizing)&&!isDragging&&HANDLES.map(([handle,cursor,posStyle])=>(
-          <div key={handle} className="resize-handle" onMouseDown={e=>startResize(handle,e)}
-            style={{position:"absolute",...posStyle,width:20,height:20,cursor,zIndex:10,background:"transparent"}}/>
+          <div key={handle} className="resize-handle" onPointerDown={e=>startResize(handle,e)}
+            style={{position:"absolute",...posStyle,width:20,height:20,cursor,zIndex:10,background:"transparent",touchAction:"none"}}/>
         ))}
       </div>
       {isDragging&&ghostPos&&overDeck&&<div style={{position:"fixed",left:ghostPos.x-95,top:ghostPos.y-122,width:190,background:C.white,border:`2px solid ${C.coral}`,borderRadius:20,overflow:"hidden",pointerEvents:"none",zIndex:9999,opacity:0.85,transform:"scale(1.03) rotate(-2deg)",boxShadow:"0 16px 40px rgba(0,0,0,0.2)"}}>
@@ -820,11 +820,11 @@ function BoardRouteCard({card,onRemove,onOpen,onResize,onPosChange,groupDrag,zoo
 
 function BoardArrowCard({card,onRemove,onPosChange,groupDrag,zoom}){
   const isTxt=card.dir==="then"||card.dir==="next";
-  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onMouseDown,isSelected}=useBoardDrag(card,onRemove,80,80,1,onPosChange,groupDrag,zoom);
+  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onPointerDown,isSelected}=useBoardDrag(card,onRemove,80,80,1,onPosChange,groupDrag,zoom);
   return(
     <>
-      <div data-carduid={card.uid} onMouseDown={onMouseDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}
-        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:64,height:64,background:hovered&&!isDragging?card.bg:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",cursor:isDragging?"grabbing":"grab",transition:isDragging?"none":"all 0.15s",boxShadow:hovered&&!isDragging?C.shadowHover:C.shadow,zIndex:isDragging?999:hovered?100:15,userSelect:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
+      <div data-carduid={card.uid} onPointerDown={onPointerDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}
+        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:64,height:64,background:hovered&&!isDragging?card.bg:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:14,display:"flex",alignItems:"center",justifyContent:"center",cursor:isDragging?"grabbing":"grab",transition:isDragging?"none":"all 0.15s",boxShadow:hovered&&!isDragging?C.shadowHover:C.shadow,zIndex:isDragging?999:hovered?100:15,userSelect:"none",touchAction:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
         {hovered&&!isDragging&&<button className="rm-btn" onClick={()=>onRemove(card.uid)} style={{position:"absolute",top:3,right:3,background:"none",border:"none",cursor:"pointer",fontSize:9,color:C.gray400,lineHeight:1}}>✕</button>}
         <span style={{fontSize:isTxt?12:24,fontWeight:700,color:overDeck?C.coral:card.color}}>{card.label}</span>
       </div>
@@ -837,11 +837,11 @@ function BoardArrowCard({card,onRemove,onPosChange,groupDrag,zoom}){
 
 
 function BoardMiscCard({card,onRemove,onOpen,onPosChange,groupDrag,zoom}){
-  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onMouseDown,justDraggedRef,isSelected}=useBoardDrag(card,onRemove,132,132,1,onPosChange,groupDrag,zoom);
+  const {hovered,setHovered,isDragging,overDeck,ghostPos,pos,onPointerDown,justDraggedRef,isSelected}=useBoardDrag(card,onRemove,132,132,1,onPosChange,groupDrag,zoom);
   return(
     <>
-      <div data-carduid={card.uid} onMouseDown={onMouseDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={()=>{if(!isDragging&&!justDraggedRef.current)onOpen(card);}}
-        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:132,background:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:18,padding:"18px 12px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,cursor:isDragging?"grabbing":"grab",transition:isDragging?"none":"all 0.15s",boxShadow:hovered&&!isDragging?C.shadowHover:C.shadow,zIndex:isDragging?999:hovered?100:10,userSelect:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
+      <div data-carduid={card.uid} onPointerDown={onPointerDown} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)} onClick={()=>{if(!isDragging&&!justDraggedRef.current)onOpen(card);}}
+        style={{position:"absolute",left:pos.current.x,top:pos.current.y,width:132,background:C.white,border:`1.5px solid ${overDeck?C.coral:hovered&&!isDragging?card.color:C.gray200}`,borderRadius:18,padding:"18px 12px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,cursor:isDragging?"grabbing":"grab",transition:isDragging?"none":"all 0.15s",boxShadow:hovered&&!isDragging?C.shadowHover:C.shadow,zIndex:isDragging?999:hovered?100:10,userSelect:"none",touchAction:"none",opacity:overDeck?0.4:1,outline:isSelected?`3px solid #2F6FED`:"none",outlineOffset:2}}>
         {hovered&&!isDragging&&<button className="rm-btn" onClick={e=>{e.stopPropagation();onRemove(card.uid);}} style={{position:"absolute",top:6,right:6,width:20,height:20,borderRadius:"50%",background:"rgba(255,255,255,0.9)",border:"none",cursor:"pointer",fontSize:10,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>}
         <span style={{fontSize:32}}>{card.icon}</span>
         <span style={{fontSize:13,fontWeight:700,color:card.color}}>{card.label}</span>
