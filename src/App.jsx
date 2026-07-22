@@ -1814,7 +1814,7 @@ export default function App(){
     return day.steps.map((step,si)=>({
       id:`${route.id}_d${di}_s${si}`,
       type:"misc",
-      label:`${day.label} · ${step.title||`STEP ${si+1}`}`,
+      label:`${day.label} STEP ${si+1}`,
       icon:step.emoji||route.coverEmoji||"📍",
       color:route.color,
       bg:route.bg,
