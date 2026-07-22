@@ -8,6 +8,9 @@ dist
 src/App-DESKTOP-*.jsx
 src/App.stale-backup.jsx
 
+# raw backup export used to generate src/defaultData.json, not needed in repo
+tripboard-backup-*.json
+
 # personal reference photos not used by the app (data lives in IndexedDB, not static assets)
 간사이 공항.png
 간사이 공항2.png

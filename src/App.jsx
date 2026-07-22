@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, Fragment } from "react";
+import defaultData from "./defaultData.json";
 
 let storageErrorListeners=[];
 function notifyStorageError(message){storageErrorListeners.forEach(fn=>fn(message));}
@@ -1669,18 +1670,18 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
 export default function App(){
   const [storageError,dismissStorageError]=useStorageErrorBanner();
   const [page,setPage]=useState("explore");
-  const [boardItems,setBoardItems]=usePersistentState("tripboard_boardItems",[]);
+  const [boardItems,setBoardItems]=usePersistentState("tripboard_boardItems",defaultData.tripboard_boardItems??[]);
   const [deckTab,setDeckTab]=useState("route");
   const [selectedDeckRegion,setSelectedDeckRegion]=useState(null);
   const [deckRegionMenuOpen,setDeckRegionMenuOpen]=useState(false);
   const [detailCard,setDetailCard]=useState(null);
   const [miscDetailCard,setMiscDetailCard]=useState(null);
   const [communityModal,setCommunityModal]=useState(null);
-  const [deckRouteIds,setDeckRouteIds]=usePersistentState("tripboard_deckRouteIds",()=>ROUTE_DECK.map(r=>r.id));
-  const [deletedRouteDeckIds,setDeletedRouteDeckIds]=usePersistentState("tripboard_deletedRouteDeckIds",[]);
-  const [savedRoutes,setSavedRoutes]=usePersistentState("tripboard_savedRoutes",[]);
-  const [deckCommunityIds,setDeckCommunityIds]=usePersistentState("tripboard_deckCommunityIds",[]);
-  const [savedRouteMergedDays,setSavedRouteMergedDays]=usePersistentState("tripboard_savedRouteMergedDays",[]);
+  const [deckRouteIds,setDeckRouteIds]=usePersistentState("tripboard_deckRouteIds",defaultData.tripboard_deckRouteIds??(()=>ROUTE_DECK.map(r=>r.id)));
+  const [deletedRouteDeckIds,setDeletedRouteDeckIds]=usePersistentState("tripboard_deletedRouteDeckIds",defaultData.tripboard_deletedRouteDeckIds??[]);
+  const [savedRoutes,setSavedRoutes]=usePersistentState("tripboard_savedRoutes",defaultData.tripboard_savedRoutes??[]);
+  const [deckCommunityIds,setDeckCommunityIds]=usePersistentState("tripboard_deckCommunityIds",defaultData.tripboard_deckCommunityIds??[]);
+  const [savedRouteMergedDays,setSavedRouteMergedDays]=usePersistentState("tripboard_savedRouteMergedDays",defaultData.tripboard_savedRouteMergedDays??[]);
   function isSavedDayMerged(routeId,di){return savedRouteMergedDays.includes(`${routeId}::${di}`);}
   function toggleSavedDayMergePref(routeId,di){
     const key=`${routeId}::${di}`;
@@ -1688,9 +1689,9 @@ export default function App(){
   }
   const [exploreFilter,setExploreFilter]=useState("전체");
   const [categoryOpen,setCategoryOpen]=useState(false);
-  const [myCards,setMyCards]=usePersistentState("tripboard_myCards",[]);
+  const [myCards,setMyCards]=usePersistentState("tripboard_myCards",defaultData.tripboard_myCards??[]);
   const [importedPhoto,setImportedPhoto]=useState(null);
-  const [myPosts,setMyPosts]=usePersistentState("tripboard_myPosts",[]);
+  const [myPosts,setMyPosts]=usePersistentState("tripboard_myPosts",defaultData.tripboard_myPosts??[]);
   useEffect(()=>{
     const cardIds=new Set(myCards.map(c=>c.id));
     setMyPosts(prev=>prev.filter(p=>p.isBoardLayout||cardIds.has(p.sourceId)));
