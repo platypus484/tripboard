@@ -2147,35 +2147,43 @@ export default function App(){
   }
   function syncCardToBoard(card){
     const days=(card.days||[]).map(d=>({...d,steps:d.steps.filter(s=>(s.desc&&s.desc.trim())||(s.photos&&s.photos.length>0))})).filter(d=>d.steps.length>0);
-    if(!days.length)return;
-    const patches={};
+    const newItemsById={};
     let dayCounter=0;
     days.forEach((day,di)=>{
       if(day.kind!=="misc")dayCounter++;
       const dayLabel=day.kind==="misc"?"기타":`${dayCounter}일차`;
       if(day.merge){
-        patches[`${card.id}_d${di}`]={
-          label:dayLabel,
-          color:card.color||C.coral,
-          bg:card.bg||"#FFF0F0",
+        const id=`${card.id}_d${di}`;
+        newItemsById[id]={
+          id,type:"misc",label:dayLabel,icon:"📍",color:card.color||C.coral,bg:card.bg||"#FFF0F0",
           steps:day.steps.map(s=>({desc:s.desc||"",photos:s.photos||[],hideText:!!s.hideText,hidePhoto:!!s.hidePhoto})),
         };
       }else{
         day.steps.forEach((step,si)=>{
-          patches[`${card.id}_d${di}_s${si}`]={
-            label:`${dayLabel} STEP ${si+1}`,
-            icon:"📍",
-            color:card.color||C.coral,
-            bg:card.bg||"#FFF0F0",
-            text:step.desc||"",
-            photos:step.photos||[],
-            hideText:!!step.hideText,
-            hidePhoto:!!step.hidePhoto,
+          const id=`${card.id}_d${di}_s${si}`;
+          newItemsById[id]={
+            id,type:"misc",label:`${dayLabel} STEP ${si+1}`,icon:"📍",color:card.color||C.coral,bg:card.bg||"#FFF0F0",
+            text:step.desc||"",photos:step.photos||[],hideText:!!step.hideText,hidePhoto:!!step.hidePhoto,
           };
         });
       }
     });
-    if(Object.keys(patches).length)setBoardItems(prev=>prev.map(i=>patches[i.id]?{...i,...patches[i.id]}:i));
+    const prefix=`${card.id}_`;
+    const newIds=new Set(Object.keys(newItemsById));
+    const existingIds=new Set(boardItems.filter(i=>i.id&&i.id.startsWith(prefix)).map(i=>i.id));
+    let next=boardItems
+      .filter(i=>!(i.id&&i.id.startsWith(prefix))||newIds.has(i.id))
+      .map(i=>newItemsById[i.id]?{...i,...newItemsById[i.id]}:i);
+    const toAddIds=[...newIds].filter(id=>!existingIds.has(id));
+    if(toAddIds.length){
+      const stepGapX=cardSize("misc").w+10+64+10;
+      const origin=findFreeOrigin();
+      toAddIds.forEach((id,idx)=>{next=computeDropResult(newItemsById[id],{x:origin.x+idx*stepGapX,y:origin.y},next);});
+    }
+    const liveUids=new Set(next.filter(i=>i.type!=="arrow").map(i=>i.uid));
+    next=next.filter(i=>i.type!=="arrow"||!i.linkedTo||liveUids.has(i.linkedTo));
+    setBoardItems(next);
+    if(Object.keys(newItemsById).length===0)return;
     const dayPlans=buildDayPlansFromCard(card);
     const emoji=card.photo?.emoji||card.emoji||"🗺️";
     setMyPosts(prev=>prev.map(p=>p.sourceCardId===card.id?{...p,title:card.title||p.title,desc:card.desc||p.desc,region:card.region||p.region,color:card.color||p.color,bg:card.bg||p.bg,coverEmoji:emoji,photoDataUrl:card.photo?.dataUrl,dayPlans}:p));
