@@ -1115,7 +1115,7 @@ function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,delet
   );
 }
 
-function makeStep(){return{id:`s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,desc:"",photos:[]};}
+function makeStep(){return{id:`s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,title:"",desc:"",photos:[]};}
 function normalizeStepPhotos(step){return step.photos?step:{...step,photos:step.photo?[step.photo]:[]};}
 function makeDay(kind="day"){return{id:`d_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,kind,theme:"",steps:[makeStep()],merge:false};}
 
@@ -1191,23 +1191,13 @@ function DrawCanvasModal({onSave,onClose}){
   );
 }
 
-function StepNumberInput({value,max,accentColor,onCommit}){
-  const [local,setLocal]=useState(String(value));
-  useEffect(()=>{setLocal(String(value));},[value]);
-  function commit(){
-    const n=parseInt(local,10);
-    if(!isNaN(n)&&n>=1&&n<=max)onCommit(n);
-    else setLocal(String(value));
-  }
+function StepTitleInput({title,defaultLabel,accentColor,onChange}){
   return(
     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-      <span style={{fontSize:11,fontWeight:800,color:accentColor}}>STEP</span>
-      <input type="number" min={1} max={max} value={local}
-        onChange={e=>setLocal(e.target.value)}
-        onBlur={commit}
-        onKeyDown={e=>{if(e.key==="Enter")e.currentTarget.blur();}}
-        style={{width:48,padding:"4px 6px",borderRadius:8,border:`1px solid ${C.gray200}`,fontSize:12,fontWeight:700,color:C.gray900,textAlign:"center",outline:"none"}}/>
-      <span style={{fontSize:10,color:C.gray400}}>/ {max}</span>
+      <span style={{fontSize:11,fontWeight:800,color:accentColor,flexShrink:0}}>STEP</span>
+      <input value={title} placeholder={defaultLabel}
+        onChange={e=>onChange(e.target.value)}
+        style={{flex:1,padding:"5px 8px",borderRadius:8,border:`1px solid ${C.gray200}`,fontSize:12,fontWeight:700,color:C.gray900,outline:"none"}}/>
     </div>
   );
 }
@@ -1646,7 +1636,7 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
                           {day.steps.length>1&&<div draggable onDragStart={()=>setDragStep({dayId:day.id,index:si})} onDragEnd={()=>setDragStep(null)}
                             title="드래그해서 순서 바꾸기"
                             style={{position:"absolute",top:-10,left:-10,width:28,height:28,borderRadius:"50%",background:C.white,border:`1.5px solid ${C.gray200}`,cursor:"grab",fontSize:14,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:C.shadow,letterSpacing:-1}}>⠿</div>}
-                          {day.steps.length>1&&<StepNumberInput value={si+1} max={day.steps.length} accentColor={form.color.color} onCommit={n=>moveStep(day.id,si,n-1)}/>}
+                          <StepTitleInput title={step.title||""} defaultLabel={`STEP ${si+1}`} accentColor={form.color.color} onChange={v=>updateStep(day.id,step.id,"title",v)}/>
                           <PhotoStack photos={step.photos} accentColor={form.color.color} accentBg={form.color.bg} boxHeight={180}
                             onUpload={e=>handleStepPhotoUpload(day.id,step.id,e)} onPaste={e=>handleStepPhotoPaste(day.id,step.id,e)} onRemove={pi=>removeStepPhoto(day.id,step.id,pi)}
                             hidePhoto={step.hidePhoto} onSetHidePhoto={hp=>updateStep(day.id,step.id,"hidePhoto",hp)}/>
@@ -1838,7 +1828,7 @@ export default function App(){
     return day.steps.map((step,si)=>({
       id:`${route.id}_d${di}_s${si}`,
       type:"misc",
-      label:`${day.label} STEP ${si+1}`,
+      label:`${day.label} ${step.title||`STEP ${si+1}`}`,
       icon:step.emoji||route.coverEmoji||"📍",
       color:route.color,
       bg:route.bg,
@@ -1888,7 +1878,7 @@ export default function App(){
           const item={
             id:`${card.id}_d${di}_s${si}`,
             type:"misc",
-            label:`${dayLabel} STEP ${si+1}`,
+            label:`${dayLabel} ${step.title||`STEP ${si+1}`}`,
             icon:"📍",
             color:card.color||C.coral,
             bg:card.bg||"#FFF0F0",
@@ -2115,7 +2105,7 @@ export default function App(){
       const label=d.kind==="misc"?"기타":`${++dayCounter}일차`;
       return{
         day:dayCounter,label,theme:d.theme||"",
-        steps:d.steps.map((s,si)=>({emoji:"📍",title:(s.desc||"").trim().slice(0,20)||`활동 ${si+1}`,desc:s.desc||"",tip:"",photoDataUrl:s.photos?.[0]?.dataUrl})),
+        steps:d.steps.map((s,si)=>({emoji:"📍",title:s.title?.trim()||`STEP ${si+1}`,desc:s.desc||"",tip:"",photoDataUrl:s.photos?.[0]?.dataUrl})),
       };
     });
   }
@@ -2162,7 +2152,7 @@ export default function App(){
         day.steps.forEach((step,si)=>{
           const id=`${card.id}_d${di}_s${si}`;
           newItemsById[id]={
-            id,type:"misc",label:`${dayLabel} STEP ${si+1}`,icon:"📍",color:card.color||C.coral,bg:card.bg||"#FFF0F0",
+            id,type:"misc",label:`${dayLabel} ${step.title||`STEP ${si+1}`}`,icon:"📍",color:card.color||C.coral,bg:card.bg||"#FFF0F0",
             text:step.desc||"",photos:step.photos||[],hideText:!!step.hideText,hidePhoto:!!step.hidePhoto,
           };
         });
