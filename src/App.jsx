@@ -1030,7 +1030,7 @@ function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,delet
                       );
                     })}
                   </div>
-                  {onDeleteSavedRoute&&<button onMouseDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onDeleteSavedRoute(route.id);}}
+                  {onDeleteSavedRoute&&<button onMouseDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();if(window.confirm("덱관리에서 삭제하시겠습니까?"))onDeleteSavedRoute(route.id);}}
                     title="저장한 루트 완전히 삭제"
                     style={{position:"absolute",top:-8,right:-8,width:22,height:22,borderRadius:"50%",background:C.white,border:`1px solid ${C.gray200}`,cursor:"pointer",fontSize:11,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}
                     onMouseEnter={e=>{e.currentTarget.style.background=C.coral;e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor=C.coral;}}
@@ -1097,7 +1097,7 @@ function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,delet
                     style={{background:"none",border:"none",cursor:"pointer",fontSize:15,color:inDeck?C.coral:C.green,marginLeft:"auto",fontWeight:700}}>
                     {inDeck?"✕":"+"}
                   </button>
-                  {onDeleteForever&&<button onMouseDown={e=>e.stopPropagation()} onContextMenu={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onDeleteForever(route.id);}}
+                  {onDeleteForever&&<button onMouseDown={e=>e.stopPropagation()} onContextMenu={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();if(window.confirm("덱관리에서 삭제하시겠습니까?"))onDeleteForever(route.id);}}
                     title="이 카드덱 완전히 삭제"
                     style={{position:"absolute",top:-8,right:-8,width:22,height:22,borderRadius:"50%",background:C.white,border:`1px solid ${C.gray200}`,cursor:"pointer",fontSize:11,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}
                     onMouseEnter={e=>{e.currentTarget.style.background=C.coral;e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor=C.coral;}}
@@ -1359,7 +1359,7 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
                     </div>
                     <div>
                       <div style={{fontSize:13,fontWeight:800,color:C.coral,marginBottom:4}}>📋 카드 제작 → 덱 관리</div>
-                      <div style={{fontSize:13,color:C.gray600,lineHeight:1.6}}>만든 카드는 덱 관리의 "내가 만든 카드"에도 나타나서 보드판 추가/제거·완전 삭제를 거기서도 할 수 있어요.</div>
+                      <div style={{fontSize:13,color:C.gray600,lineHeight:1.6}}>만든 카드는 덱 관리의 "내가 만든 카드"에도 나타나서 보드판 추가/제거를 거기서도 할 수 있어요.</div>
                     </div>
                   </div>
                 </div>}
