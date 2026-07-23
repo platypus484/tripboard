@@ -2624,12 +2624,22 @@ export default function App(){
             <span style={{fontSize:10,color:C.gray400,marginLeft:8,lineHeight:1.7}}>준비물, 이야기 등<br/>사진과 함께 기록</span>
           </div>}
           {deckTab==="saved"&&<div data-deck-row="true" onMouseDown={handleDeckRowMouseDown} style={{display:"flex",gap:8,overflowX:"auto",paddingBottom:2,cursor:"grab"}}>
-            {myCards.length===0?
-              <div style={{fontSize:11,color:C.gray400,alignSelf:"center"}}>카드 제작에서 만들거나, 루트 상세보기에서 스텝을 저장하면 여기에 모여요</div>
-            :myCards.map(card=>card.type==="misc"
-              ?<MiscDeckCard key={card.id} template={card} onDrop={handleDrop} zoom={boardZoom}/>
-              :<RouteDeckCard key={card.id} route={{...card,cost:card.cost||"미정",duration:card.duration||"미정"}} onDrop={handleDrop} zoom={boardZoom}/>
-            )}
+            {myCards.length===0&&savedRoutes.length===0?
+              <div style={{fontSize:11,color:C.gray400,alignSelf:"center"}}>카드 제작에서 만들거나, 탐색에서 루트를 저장하면 여기에 모여요</div>
+            :<>
+              {savedRoutes.map(route=>(
+                <div key={route.id} onClick={()=>addRouteStepsToBoard(route)} title="보드판에 순서대로 추가"
+                  style={{width:100,flexShrink:0,background:C.white,border:`1.5px solid ${C.gray200}`,borderRadius:16,padding:"14px 10px",cursor:"pointer",textAlign:"center",userSelect:"none"}}>
+                  <div style={{fontSize:32,marginBottom:6}}>{route.coverEmoji||"🗺️"}</div>
+                  <div style={{fontSize:11,fontWeight:600,color:C.gray600,lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{route.title}</div>
+                  <div style={{fontSize:10,color:route.color||C.coral,fontWeight:700,marginTop:4}}>+ 전체 추가</div>
+                </div>
+              ))}
+              {myCards.map(card=>card.type==="misc"
+                ?<MiscDeckCard key={card.id} template={card} onDrop={handleDrop} zoom={boardZoom}/>
+                :<RouteDeckCard key={card.id} route={{...card,cost:card.cost||"미정",duration:card.duration||"미정"}} onDrop={handleDrop} zoom={boardZoom}/>
+              )}
+            </>}
           </div>}
         </div>
       )}
