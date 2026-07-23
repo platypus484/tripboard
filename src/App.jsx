@@ -1698,10 +1698,6 @@ export default function App(){
   const [importedPhoto,setImportedPhoto]=useState(null);
   const [myPosts,setMyPosts]=usePersistentState("tripboard_myPosts",defaultData.tripboard_myPosts??[]);
   const [savedBoards,setSavedBoards]=usePersistentState("tripboard_savedBoards",defaultData.tripboard_savedBoards??[]);
-  useEffect(()=>{
-    const cardIds=new Set(myCards.map(c=>c.id));
-    setMyPosts(prev=>prev.filter(p=>p.isBoardLayout||cardIds.has(p.sourceId)));
-  },[myCards]);
   const [selectedUids,setSelectedUids]=useState([]);
   const [selBox,setSelBox]=useState(null);
   const [boardZoom,setBoardZoom]=useState(1);
