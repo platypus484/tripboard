@@ -1191,14 +1191,12 @@ function DrawCanvasModal({onSave,onClose}){
   );
 }
 
-function StepTitleInput({title,defaultLabel,accentColor,onChange}){
+function StepTitleInput({title,defaultLabel,onChange}){
   return(
-    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-      <span style={{fontSize:11,fontWeight:800,color:accentColor,flexShrink:0}}>STEP</span>
-      <input value={title} placeholder={defaultLabel}
-        onChange={e=>onChange(e.target.value)}
-        style={{flex:1,padding:"5px 8px",borderRadius:8,border:`1px solid ${C.gray200}`,fontSize:12,fontWeight:700,color:C.gray900,outline:"none"}}/>
-    </div>
+    <input value={title||defaultLabel}
+      onFocus={()=>{if(!title)onChange(defaultLabel);}}
+      onChange={e=>onChange(e.target.value)}
+      style={{width:"100%",marginBottom:10,padding:"6px 10px",borderRadius:8,border:`1px solid ${C.gray200}`,fontSize:13,fontWeight:800,color:C.gray900,outline:"none",boxSizing:"border-box"}}/>
   );
 }
 
@@ -1636,7 +1634,7 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
                           {day.steps.length>1&&<div draggable onDragStart={()=>setDragStep({dayId:day.id,index:si})} onDragEnd={()=>setDragStep(null)}
                             title="드래그해서 순서 바꾸기"
                             style={{position:"absolute",top:-10,left:-10,width:28,height:28,borderRadius:"50%",background:C.white,border:`1.5px solid ${C.gray200}`,cursor:"grab",fontSize:14,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:C.shadow,letterSpacing:-1}}>⠿</div>}
-                          <StepTitleInput title={step.title||""} defaultLabel={`STEP ${si+1}`} accentColor={form.color.color} onChange={v=>updateStep(day.id,step.id,"title",v)}/>
+                          <StepTitleInput title={step.title||""} defaultLabel={`STEP ${si+1}`} onChange={v=>updateStep(day.id,step.id,"title",v)}/>
                           <PhotoStack photos={step.photos} accentColor={form.color.color} accentBg={form.color.bg} boxHeight={180}
                             onUpload={e=>handleStepPhotoUpload(day.id,step.id,e)} onPaste={e=>handleStepPhotoPaste(day.id,step.id,e)} onRemove={pi=>removeStepPhoto(day.id,step.id,pi)}
                             hidePhoto={step.hidePhoto} onSetHidePhoto={hp=>updateStep(day.id,step.id,"hidePhoto",hp)}/>
