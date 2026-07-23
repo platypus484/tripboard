@@ -2089,7 +2089,7 @@ export default function App(){
     };
     setMyPosts(prev=>prev.some(p=>p.sourceId===card.id)?prev.map(p=>p.sourceId===card.id?post:p):[post,...prev]);
   }
-  function unpublishCard(cardId){setMyPosts(prev=>prev.filter(p=>p.sourceId!==cardId));}
+  function unpublishCard(cardId){setMyPosts(prev=>prev.filter(p=>p.sourceId!==cardId&&p.sourceCardId!==cardId));}
   function removeMyPost(postId){setMyPosts(prev=>prev.filter(p=>p.id!==postId));}
   function isMyCardOnBoard(cardId){return boardItems.some(i=>i.id===cardId||(typeof i.id==="string"&&i.id.startsWith(cardId+"_d")));}
   function addMyCardToBoard(card){
@@ -2174,7 +2174,7 @@ export default function App(){
     if(Object.keys(newItemsById).length===0)return;
     const dayPlans=buildDayPlansFromCard(card);
     const emoji=card.photo?.emoji||card.emoji||"🗺️";
-    setMyPosts(prev=>prev.map(p=>p.sourceCardId===card.id?{...p,title:card.title||p.title,desc:card.desc||p.desc,region:card.region||p.region,color:card.color||p.color,bg:card.bg||p.bg,coverEmoji:emoji,photoDataUrl:card.photo?.dataUrl,dayPlans}:p));
+    setMyPosts(prev=>prev.map(p=>(p.sourceCardId===card.id||p.sourceId===card.id)?{...p,title:card.title||p.title,desc:card.desc||p.desc,region:card.region||p.region,color:card.color||p.color,bg:card.bg||p.bg,coverEmoji:emoji,photoDataUrl:card.photo?.dataUrl,dayPlans}:p));
   }
   function importBoardFromPost(route){
     if(!route.boardSnapshot)return;
@@ -2429,7 +2429,7 @@ export default function App(){
         </div>
       )}
 
-      {page==="create"&&<CreateCardTab myCards={myCards} setMyCards={setMyCards} onAddToBoard={handleDrop} onAddDaysToBoard={addCardDaysToBoard} boardCardIds={boardItems.map(i=>i.id)} onRemoveFromBoard={removeFromBoardBySourceId} importedPhoto={importedPhoto} clearImportedPhoto={()=>setImportedPhoto(null)} publishedIds={myPosts.map(p=>p.sourceId)} onPublish={publishCardToExplore} onUnpublish={unpublishCard} onGoExplore={()=>setPage("explore")} onSaveToBoardAndPublish={saveCardToBoardAndPublish} onSyncToBoard={syncCardToBoard}/>}
+      {page==="create"&&<CreateCardTab myCards={myCards} setMyCards={setMyCards} onAddToBoard={handleDrop} onAddDaysToBoard={addCardDaysToBoard} boardCardIds={boardItems.map(i=>i.id)} onRemoveFromBoard={removeFromBoardBySourceId} importedPhoto={importedPhoto} clearImportedPhoto={()=>setImportedPhoto(null)} publishedIds={[...myPosts.map(p=>p.sourceId),...myPosts.map(p=>p.sourceCardId)].filter(Boolean)} onPublish={publishCardToExplore} onUnpublish={unpublishCard} onGoExplore={()=>setPage("explore")} onSaveToBoardAndPublish={saveCardToBoardAndPublish} onSyncToBoard={syncCardToBoard}/>}
 
       {page==="savedboards"&&(
         <div style={{flex:1,overflowY:"auto",padding:"24px 28px"}}>
