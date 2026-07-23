@@ -1686,6 +1686,8 @@ export default function App(){
     setShowMobileGuide(false);
     if(dontShowAgain)localStorage.setItem("tripboard_hideMobileGuide","1");
   }
+  const [showIntroBanner,setShowIntroBanner]=useState(()=>localStorage.getItem("tripboard_hideIntroBanner")!=="1");
+  function dismissIntroBanner(){setShowIntroBanner(false);localStorage.setItem("tripboard_hideIntroBanner","1");}
   const [boardItems,setBoardItems]=usePersistentState("tripboard_boardItems",defaultData.tripboard_boardItems??[]);
   const [deckTab,setDeckTab]=useState("route");
   const [selectedDeckRegion,setSelectedDeckRegion]=useState(null);
@@ -2218,6 +2220,8 @@ export default function App(){
           .tb-header-meta{display:none !important;}
           .tb-decktabs{flex-wrap:nowrap !important;}
           .tb-deckhint{display:none !important;}
+          .tb-intro-banner{flex-direction:column !important;padding:16px 40px 16px 16px !important;}
+          .tb-intro-banner .tb-intro-arrow{display:none !important;}
           .tb-board-costbox{top:10px !important;right:10px !important;padding:8px 12px 8px 10px !important;gap:8px !important;border-radius:14px !important;}
           .tb-board-costbox .tb-cost-icon{width:32px !important;height:32px !important;font-size:16px !important;}
           .tb-board-costbox .tb-cost-label{font-size:9px !important;}
@@ -2313,6 +2317,25 @@ export default function App(){
           <div style={{marginBottom:20}}>
             <h1 style={{fontSize:24,fontWeight:800,color:C.gray900,margin:"0 0 4px"}}>어디로 떠나볼까요?</h1>
             <p style={{fontSize:13,color:C.gray400,margin:"0 0 16px"}}>다른 여행자의 루트를 따라가거나 나만의 루트로 수정해보세요</p>
+            {showIntroBanner&&(
+              <div className="tb-intro-banner" style={{position:"relative",display:"flex",alignItems:"stretch",gap:16,background:C.white,border:`1px solid ${C.gray100}`,borderRadius:20,boxShadow:C.shadow,padding:"20px 44px 20px 20px",marginBottom:20}}>
+                <button onClick={dismissIntroBanner} title="닫기" style={{position:"absolute",top:12,right:12,width:24,height:24,borderRadius:"50%",background:C.gray50,border:"none",cursor:"pointer",fontSize:12,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+                {[
+                  {emoji:"✏️",color:C.coral,bg:"#FFF0F0",title:"카드 제작",desc:"사진·글·비용을 담아 나만의 루트 카드를 만들어요"},
+                  {emoji:"🗺️",color:C.blue,bg:"#EEF4FF",title:"보드판 조립",desc:"드래그로 자유롭게 배치하고 화살표로 연결해요"},
+                  {emoji:"🔍",color:C.green,bg:"#E6FAF2",title:"탐색 공유",desc:"다른 루트를 가져오거나 내 루트를 공유해요"},
+                ].map((s,i,arr)=>(
+                  <Fragment key={s.title}>
+                    <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",gap:8}}>
+                      <div style={{width:52,height:52,borderRadius:16,background:s.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,flexShrink:0}}>{s.emoji}</div>
+                      <div style={{fontSize:14,fontWeight:800,color:s.color}}>{s.title}</div>
+                      <div style={{fontSize:12,color:C.gray400,lineHeight:1.5}}>{s.desc}</div>
+                    </div>
+                    {i<arr.length-1&&<div className="tb-intro-arrow" style={{alignSelf:"center",fontSize:20,color:C.gray200,flexShrink:0}}>→</div>}
+                  </Fragment>
+                ))}
+              </div>
+            )}
             <button onClick={()=>setCategoryOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 16px",borderRadius:20,border:`1.5px solid ${categoryOpen||exploreFilter!=="전체"?C.coral:C.gray200}`,background:categoryOpen||exploreFilter!=="전체"?"#FFF0F0":C.white,color:categoryOpen||exploreFilter!=="전체"?C.coral:C.gray600,fontSize:12,fontWeight:600,cursor:"pointer",transition:"all 0.15s"}}>
               카테고리{exploreFilter!=="전체"?` · ${exploreFilter}`:""}
               <span style={{fontSize:22,transform:categoryOpen?"rotate(180deg)":"rotate(0)",transition:"transform 0.15s"}}>▾</span>
