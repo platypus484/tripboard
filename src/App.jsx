@@ -856,7 +856,7 @@ function BoardMiscCard({card,onRemove,onOpen,onPosChange,groupDrag,zoom}){
   );
 }
 
-function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,deletedIds,onDeleteForever,savedRoutes,deckCommunityIds,setDeckCommunityIds,onAddRouteToBoard,onAddRouteDayToBoard,onRemoveRouteDayFromBoard,onDeleteSavedRoute,onAddSingleRouteToBoard,onRemoveSingleRouteFromBoard,myCards,isMyCardOnBoard,onAddMyCardToBoard,onRemoveMyCardFromBoard,onDeleteMyCard,isSavedDayMerged,onToggleSavedDayMerge}){
+function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,deletedIds,onDeleteForever,savedRoutes,deckCommunityIds,setDeckCommunityIds,onAddRouteToBoard,onAddRouteDayToBoard,onRemoveRouteDayFromBoard,onDeleteSavedRoute,onAddSingleRouteToBoard,onRemoveSingleRouteFromBoard,myCards,isMyCardOnBoard,onAddMyCardToBoard,onRemoveMyCardFromBoard,isSavedDayMerged,onToggleSavedDayMerge}){
   function setMyCardBoard(card,on){
     const isIn=isMyCardOnBoard?isMyCardOnBoard(card.id):false;
     if(on&&!isIn){onAddMyCardToBoard&&onAddMyCardToBoard(card);}
@@ -1065,13 +1065,6 @@ function DeckRouteManager({deckRouteIds,setDeckRouteIds,onAddRegionToBoard,delet
                     style={{background:"none",border:"none",cursor:"pointer",fontSize:15,color:inDeck?C.coral:C.green,marginLeft:"auto",fontWeight:700}}>
                     {inDeck?"✕":"+"}
                   </button>
-                  {onDeleteMyCard&&<button onMouseDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();onDeleteMyCard(card.id);}}
-                    title="이 카드 완전히 삭제"
-                    style={{position:"absolute",top:-8,right:-8,width:22,height:22,borderRadius:"50%",background:C.white,border:`1px solid ${C.gray200}`,cursor:"pointer",fontSize:11,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:C.shadow}}
-                    onMouseEnter={e=>{e.currentTarget.style.background=C.coral;e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor=C.coral;}}
-                    onMouseLeave={e=>{e.currentTarget.style.background=C.white;e.currentTarget.style.color=C.gray400;e.currentTarget.style.borderColor=C.gray200;}}>
-                    ✕
-                  </button>}
                 </div>
               );
             })}
@@ -2097,7 +2090,6 @@ export default function App(){
     const hasDays=(card.days||[]).some(d=>d.steps.some(s=>(s.desc&&s.desc.trim())||(s.photos&&s.photos.length>0)));
     if(hasDays)addCardDaysToBoard(card);else handleDrop({...card},null);
   }
-  function deleteMyCard(cardId){setMyCards(prev=>prev.filter(c=>c.id!==cardId));unpublishCard(cardId);}
   function buildDayPlansFromCard(card){
     const filledDays=(card.days||[]).map(d=>({...d,steps:d.steps.filter(s=>(s.desc&&s.desc.trim())||(s.photos&&s.photos.length>0))})).filter(d=>d.steps.length>0);
     let dayCounter=0;
@@ -2415,7 +2407,7 @@ export default function App(){
             <DeckRouteManager deckRouteIds={deckRouteIds} setDeckRouteIds={setDeckRouteIds} onAddRegionToBoard={addRegionRouteCardsToBoard} deletedIds={deletedRouteDeckIds} onDeleteForever={deleteRouteDeckForever}
               savedRoutes={savedRoutes} deckCommunityIds={deckCommunityIds} setDeckCommunityIds={setDeckCommunityIds} onAddRouteToBoard={addRouteStepsToBoard} onAddRouteDayToBoard={addRouteDayToBoard} onRemoveRouteDayFromBoard={removeRouteDayFromBoard} onDeleteSavedRoute={id=>setSavedRoutes(prev=>prev.filter(r=>r.id!==id))}
               onAddSingleRouteToBoard={addSingleRouteToBoard} onRemoveSingleRouteFromBoard={removeFromBoardBySourceId}
-              myCards={myCards} isMyCardOnBoard={isMyCardOnBoard} onAddMyCardToBoard={addMyCardToBoard} onRemoveMyCardFromBoard={removeFromBoardBySourceId} onDeleteMyCard={deleteMyCard}
+              myCards={myCards} isMyCardOnBoard={isMyCardOnBoard} onAddMyCardToBoard={addMyCardToBoard} onRemoveMyCardFromBoard={removeFromBoardBySourceId}
               isSavedDayMerged={isSavedDayMerged} onToggleSavedDayMerge={toggleSavedDayMergePref}/>
           </div>
           <button onClick={()=>setPage("board")} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:`linear-gradient(135deg,${C.coral},${C.orange})`,color:"#fff",fontSize:14,fontWeight:700,cursor:"pointer",boxShadow:`0 4px 20px ${C.coral}40`,marginTop:24}}>보드판으로 이동 →</button>
