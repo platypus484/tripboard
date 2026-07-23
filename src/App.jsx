@@ -1191,6 +1191,27 @@ function DrawCanvasModal({onSave,onClose}){
   );
 }
 
+function StepNumberInput({value,max,accentColor,onCommit}){
+  const [local,setLocal]=useState(String(value));
+  useEffect(()=>{setLocal(String(value));},[value]);
+  function commit(){
+    const n=parseInt(local,10);
+    if(!isNaN(n)&&n>=1&&n<=max)onCommit(n);
+    else setLocal(String(value));
+  }
+  return(
+    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+      <span style={{fontSize:11,fontWeight:800,color:accentColor}}>STEP</span>
+      <input type="number" min={1} max={max} value={local}
+        onChange={e=>setLocal(e.target.value)}
+        onBlur={commit}
+        onKeyDown={e=>{if(e.key==="Enter")e.currentTarget.blur();}}
+        style={{width:48,padding:"4px 6px",borderRadius:8,border:`1px solid ${C.gray200}`,fontSize:12,fontWeight:700,color:C.gray900,textAlign:"center",outline:"none"}}/>
+      <span style={{fontSize:10,color:C.gray400}}>/ {max}</span>
+    </div>
+  );
+}
+
 function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCardIds,onRemoveFromBoard,importedPhoto,clearImportedPhoto,publishedIds,onPublish,onUnpublish,onGoExplore,onSaveToBoardAndPublish,onSyncToBoard}){
   const [mode,setMode]=useState(importedPhoto?"new":"list");
   const [editId,setEditId]=useState(null);
@@ -1625,6 +1646,7 @@ function CreateCardTab({myCards,setMyCards,onAddToBoard,onAddDaysToBoard,boardCa
                           {day.steps.length>1&&<div draggable onDragStart={()=>setDragStep({dayId:day.id,index:si})} onDragEnd={()=>setDragStep(null)}
                             title="드래그해서 순서 바꾸기"
                             style={{position:"absolute",top:-10,left:-10,width:28,height:28,borderRadius:"50%",background:C.white,border:`1.5px solid ${C.gray200}`,cursor:"grab",fontSize:14,color:C.gray400,display:"flex",alignItems:"center",justifyContent:"center",zIndex:2,boxShadow:C.shadow,letterSpacing:-1}}>⠿</div>}
+                          {day.steps.length>1&&<StepNumberInput value={si+1} max={day.steps.length} accentColor={form.color.color} onCommit={n=>moveStep(day.id,si,n-1)}/>}
                           <PhotoStack photos={step.photos} accentColor={form.color.color} accentBg={form.color.bg} boxHeight={180}
                             onUpload={e=>handleStepPhotoUpload(day.id,step.id,e)} onPaste={e=>handleStepPhotoPaste(day.id,step.id,e)} onRemove={pi=>removeStepPhoto(day.id,step.id,pi)}
                             hidePhoto={step.hidePhoto} onSetHidePhoto={hp=>updateStep(day.id,step.id,"hidePhoto",hp)}/>
