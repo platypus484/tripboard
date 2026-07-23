@@ -566,6 +566,7 @@ function CommunityDetailModal({route,savedIds,onSave,onClose,onImportPhoto,onSav
             <div key={i} style={{marginBottom:i<cur.steps.length-1?28:0}}>
               <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
                 <span style={{fontSize:11,fontWeight:700,color:route.color,background:route.bg,borderRadius:20,padding:"3px 10px"}}>STEP {i+1}</span>
+                {step.title&&<span style={{fontSize:14,fontWeight:700,color:C.gray900}}>{step.title}</span>}
               </div>
               {(step.photoDataUrl||!route.isMine)&&<div style={{position:"relative",marginBottom:12}}>
                 <div style={{width:"100%",aspectRatio:"16/9",borderRadius:16,background:route.bg,border:`1px solid ${route.color}20`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,overflow:"hidden"}}>
