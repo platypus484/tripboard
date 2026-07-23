@@ -81,7 +81,7 @@ function usePersistentState(key,initialValue){
   },[key,state,loaded]);
   return[state,setState];
 }
-const BACKUP_KEYS=["tripboard_boardItems","tripboard_deckRouteIds","tripboard_deletedRouteDeckIds","tripboard_savedRoutes","tripboard_deckCommunityIds","tripboard_savedRouteMergedDays","tripboard_myCards","tripboard_myPosts"];
+const BACKUP_KEYS=["tripboard_boardItems","tripboard_deckRouteIds","tripboard_deletedRouteDeckIds","tripboard_savedRoutes","tripboard_deckCommunityIds","tripboard_savedRouteMergedDays","tripboard_myCards","tripboard_myPosts","tripboard_savedBoards"];
 async function exportBackup(){
   const data={};
   for(const k of BACKUP_KEYS){
@@ -1704,6 +1704,7 @@ export default function App(){
   const [myCards,setMyCards]=usePersistentState("tripboard_myCards",defaultData.tripboard_myCards??[]);
   const [importedPhoto,setImportedPhoto]=useState(null);
   const [myPosts,setMyPosts]=usePersistentState("tripboard_myPosts",defaultData.tripboard_myPosts??[]);
+  const [savedBoards,setSavedBoards]=usePersistentState("tripboard_savedBoards",defaultData.tripboard_savedBoards??[]);
   useEffect(()=>{
     const cardIds=new Set(myCards.map(c=>c.id));
     setMyPosts(prev=>prev.filter(p=>p.isBoardLayout||cardIds.has(p.sourceId)));
@@ -1946,6 +1947,39 @@ export default function App(){
       });
     });
   }
+  function saveCurrentBoardSnapshot(){
+    if(boardItems.length===0){alert("저장할 카드가 보드판에 없어요.");return;}
+    const name=window.prompt("이 보드를 어떤 이름으로 저장할까요?","");
+    if(name===null)return;
+    const trimmed=name.trim()||`보드 ${savedBoards.length+1}`;
+    const cards=boardItems.filter(i=>i.type!=="arrow"&&i.type!=="text");
+    const cost=cards.reduce((s,c)=>{const n=parseInt((c.cost||"").replace(/[^0-9]/g,""));return s+(isNaN(n)?0:n);},0);
+    const snapshot={
+      id:`savedboard_${Date.now()}`,
+      name:trimmed,
+      savedAt:new Date().toISOString(),
+      items:boardItems.map(i=>({...i,pos:{...i.pos}})),
+      cardCount:cards.length,
+      totalCost:cost,
+    };
+    setSavedBoards(prev=>[snapshot,...prev]);
+  }
+  function loadSavedBoardToBoard(snapshot){
+    if(boardItems.length>0&&!window.confirm(`지금 보드판 내용을 지우고 "${snapshot.name}"을(를) 불러올까요?`))return;
+    const idMap={};
+    snapshot.items.forEach(item=>{idMap[item.uid]=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;});
+    const restored=snapshot.items.map(item=>({
+      ...item,
+      uid:idMap[item.uid],
+      linkedTo:item.linkedTo&&idMap[item.linkedTo]?idMap[item.linkedTo]:undefined,
+    }));
+    setBoardItems(restored);
+    setPage("board");
+  }
+  function deleteSavedBoard(id){
+    if(!window.confirm("이 저장된 보드를 삭제할까요? 되돌릴 수 없어요."))return;
+    setSavedBoards(prev=>prev.filter(s=>s.id!==id));
+  }
   function startGroupDrag(){
     const ids=new Set(selectedUids);
     boardItems.forEach(i=>{if(i.linkedTo&&ids.has(i.linkedTo))ids.add(i.uid);});
@@ -2162,7 +2196,7 @@ export default function App(){
     :COUNTRY_REGIONS[exploreFilter]?allRoutes.filter(r=>COUNTRY_REGIONS[exploreFilter].some(c=>(r.region||"").includes(c)))
     :allRoutes.filter(r=>(r.region||"").includes(exploreFilter)||(r.tags||[]).includes(exploreFilter));
   const savedIds=savedRoutes.map(r=>r.id);
-  const NAV=[["explore","탐색"],["board","보드판"],["manage","덱 관리"],["create","카드 제작"]];
+  const NAV=[["explore","탐색"],["board","보드판"],["manage","덱 관리"],["create","카드 제작"],["savedboards","저장한 보드"]];
 
   return(
     <div style={{background:"#EDEDEF",height:"100vh",overflow:"hidden",display:"flex",justifyContent:"center"}}>
@@ -2391,6 +2425,48 @@ export default function App(){
 
       {page==="create"&&<CreateCardTab myCards={myCards} setMyCards={setMyCards} onAddToBoard={handleDrop} onAddDaysToBoard={addCardDaysToBoard} boardCardIds={boardItems.map(i=>i.id)} onRemoveFromBoard={removeFromBoardBySourceId} importedPhoto={importedPhoto} clearImportedPhoto={()=>setImportedPhoto(null)} publishedIds={myPosts.map(p=>p.sourceId)} onPublish={publishCardToExplore} onUnpublish={unpublishCard} onGoExplore={()=>setPage("explore")} onSaveToBoardAndPublish={saveCardToBoardAndPublish} onSyncToBoard={syncCardToBoard}/>}
 
+      {page==="savedboards"&&(
+        <div style={{flex:1,overflowY:"auto",padding:"24px 28px"}}>
+          <div style={{marginBottom:20}}>
+            <div style={{fontSize:20,fontWeight:800,color:C.gray900,marginBottom:4}}>저장한 보드</div>
+            <div style={{fontSize:13,color:C.gray400}}>보드판에서 "이 보드 저장하기"로 저장해둔 구성을 여기서 다시 보고 불러올 수 있어요</div>
+          </div>
+          {savedBoards.length===0?(
+            <div style={{background:C.white,borderRadius:20,border:`1px solid ${C.gray100}`,padding:"60px 24px",textAlign:"center",color:C.gray400,fontSize:14}}>
+              아직 저장한 보드가 없어요. 보드판에서 원하는 대로 배치한 뒤 "이 보드 저장하기"를 눌러보세요.
+            </div>
+          ):(
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:16}}>
+              {savedBoards.map(sb=>{
+                const cards=sb.items.filter(i=>i.type!=="arrow"&&i.type!=="text");
+                return(
+                  <div key={sb.id} style={{background:C.white,borderRadius:20,border:`1px solid ${C.gray100}`,boxShadow:C.shadow,padding:20}}>
+                    <div style={{fontSize:16,fontWeight:800,color:C.gray900,marginBottom:4}}>{sb.name}</div>
+                    <div style={{fontSize:12,color:C.gray400,marginBottom:12}}>{new Date(sb.savedAt).toLocaleString()}</div>
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:14}}>
+                      {cards.slice(0,6).map((c,i)=>(
+                        <div key={i} style={{width:32,height:32,borderRadius:8,background:c.bg||"#F7F7F7",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,overflow:"hidden",flexShrink:0}}>
+                          {c.photo?.dataUrl?<img src={c.photo.dataUrl} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:(c.emoji||c.icon||"📍")}
+                        </div>
+                      ))}
+                      {cards.length>6&&<div style={{width:32,height:32,borderRadius:8,background:C.gray50,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:C.gray400,flexShrink:0}}>+{cards.length-6}</div>}
+                    </div>
+                    <div style={{display:"flex",gap:12,marginBottom:14,fontSize:12,color:C.gray600}}>
+                      <span>카드 {sb.cardCount}개</span>
+                      <span>{sb.totalCost>0?`${sb.totalCost.toLocaleString()}원`:"비용 미정"}</span>
+                    </div>
+                    <div style={{display:"flex",gap:8}}>
+                      <button onClick={()=>loadSavedBoardToBoard(sb)} style={{flex:1,padding:"9px",borderRadius:10,border:"none",background:C.coral,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>보드판에 불러오기</button>
+                      <button onClick={()=>deleteSavedBoard(sb.id)} style={{padding:"9px 12px",borderRadius:10,border:`1px solid ${C.gray200}`,background:C.white,color:C.gray400,fontSize:12,fontWeight:600,cursor:"pointer"}}>삭제</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {page==="board"&&(
         <div style={{flex:1,minHeight:0,padding:"12px 16px 0",position:"relative",display:"flex",flexDirection:"column"}}>
           <div ref={boardRef} style={{width:"100%",flex:1,minHeight:0,background:C.white,borderRadius:20,border:`1px solid ${C.gray200}`,position:"relative",overflow:"auto",boxShadow:C.shadow}}>
@@ -2417,6 +2493,10 @@ export default function App(){
             </div>
           </div>
           <div className="tb-zoom-wrap" style={{position:"absolute",bottom:32,right:36,zIndex:60,display:"flex",alignItems:"center",gap:8}}>
+            {boardItems.length>0&&<button className="tb-clear-btn" onClick={saveCurrentBoardSnapshot}
+              style={{height:44,padding:"0 16px",borderRadius:14,border:"none",background:C.coral,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",boxShadow:"0 12px 32px rgba(0,0,0,0.14)"}}>
+              이 보드 저장하기
+            </button>}
             {boardItems.length>0&&<button className="tb-clear-btn" onClick={()=>{if(window.confirm("보드판의 모든 카드를 지울까요? 되돌릴 수 없어요."))setBoardItems([]);}}
               style={{height:44,padding:"0 16px",borderRadius:14,border:`1px solid ${C.gray200}`,background:C.white,color:C.gray600,fontSize:12,fontWeight:700,cursor:"pointer",boxShadow:"0 12px 32px rgba(0,0,0,0.14)"}}>
               보드판 비우기
